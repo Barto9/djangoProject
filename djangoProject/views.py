@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from rest_framework import generics
 from .models import Note
+from django.contrib.auth.models import User
+from .serializers import UserSerializer
 from .serializers import NoteSerializer
 def counter_view(request):
     if 'count' not in request.session:
@@ -16,3 +18,7 @@ class NoteListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+class UserListCreateView(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
