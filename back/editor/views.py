@@ -1,9 +1,9 @@
 from rest_framework import generics, permissions
 from .models import Note, GDD
-from .serializers import Note, GDDs
+from .serializers import NoteSerializer, GDDSerializer  # <-- Use correct serializer names
 
 class NoteListCreateView(generics.ListCreateAPIView):
-    serializer_class = Note
+    serializer_class = NoteSerializer  # <-- Use serializer, not model
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -16,7 +16,7 @@ class NoteListCreateView(generics.ListCreateAPIView):
         serializer.save(gdd=gdd)
 
 class NoteDetailView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = Note
+    serializer_class = NoteSerializer  # <-- Use serializer, not model
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -24,7 +24,7 @@ class NoteDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Note.objects.filter(gdd__id=gdd_id, gdd__owner=self.request.user)
 
 class GDDListCreateView(generics.ListCreateAPIView):
-    serializer_class = GDDs
+    serializer_class = GDDSerializer  # <-- Use serializer, not model
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
