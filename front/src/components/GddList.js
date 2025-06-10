@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
+import { Link, useNavigate } from 'react-router-dom';
 
 const GDDList = () => {
   const [gdds, setGdds] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     api.get('/editor/gdds/')
@@ -10,9 +12,20 @@ const GDDList = () => {
       .catch(err => console.error(err));
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem('access');
+    navigate('/');
+    window.location.reload(); // Optional: force refresh to reset state
+  };
+
   return (
     <div style={{ padding: '20px' }}>
-      <h2>GDDs</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2>GDDs</h2>
+        <button onClick={handleLogout} style={{ padding: '6px 12px', cursor: 'pointer' }}>
+          Logout
+        </button>
+      </div>
       <div style={{
         maxHeight: '300px',
         overflowY: 'auto',
@@ -23,7 +36,9 @@ const GDDList = () => {
       }}>
         {gdds.map(gdd => (
           <div key={gdd.id} style={{ marginBottom: '10px' }}>
-            <strong>{gdd.name}</strong>
+            <Link to={`/gdd/${gdd.id}/notes/`} style={{ textDecoration: 'none', color: '#0074d9', fontWeight: 'bold' }}>
+              {gdd.name}
+            </Link>
             <p>{gdd.description}</p>
           </div>
         ))}
