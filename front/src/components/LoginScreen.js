@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import GDDList from './GddList';
 
 export default function LoginScreen() {
   const [loginData, setLoginData] = useState({ username: "", password: "" });
@@ -8,6 +9,7 @@ export default function LoginScreen() {
   const [registerError, setRegisterError] = useState(null);
   const [loginSuccess, setLoginSuccess] = useState(null);
   const [registerSuccess, setRegisterSuccess] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -31,6 +33,8 @@ export default function LoginScreen() {
 
       const data = await response.json();
       setLoginSuccess("Login successful!");
+      localStorage.setItem('access', data.access); // <-- Save the token
+      setIsLoggedIn(true);
       console.log("Logged in user data:", data);
       // TODO: save tokens/session, redirect, etc.
     } catch (error) {
@@ -69,6 +73,10 @@ export default function LoginScreen() {
       console.error("Register error:", error);
     }
   };
+
+  if (isLoggedIn) {
+    return <GDDList />;
+  }
 
   return (
     <div style={{ display: "flex", height: "100vh", fontFamily: "Arial, sans-serif" }}>
