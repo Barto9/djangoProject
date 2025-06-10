@@ -1,10 +1,6 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from editor.views import GddForUser
-
-router = DefaultRouter()
-router.register(r'gdds', GddForUser, basename='gdd')
+from django.urls import path
+from .views import GDDListCreateView
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('gdds/', GDDListCreateView.as_view(), name='gdd-list-create'),
 ]

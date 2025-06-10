@@ -1,9 +1,8 @@
-# editor/views.py
-from rest_framework import viewsets, permissions
+from rest_framework import generics, permissions
 from .models import GDD
 from .serializers import GDDs
 
-class GddForUser(viewsets.ModelViewSet):
+class GDDListCreateView(generics.ListCreateAPIView):
     serializer_class = GDDs
     permission_classes = [permissions.IsAuthenticated]
 
