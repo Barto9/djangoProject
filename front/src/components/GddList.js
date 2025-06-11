@@ -5,7 +5,6 @@ import { Link, useNavigate } from 'react-router-dom';
 const GDDList = () => {
   const [gdds, setGdds] = useState([]);
   const navigate = useNavigate();
-  // State for the creation modal
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newGddName, setNewGddName] = useState('');
   const [newGddDescription, setNewGddDescription] = useState('');
@@ -21,12 +20,12 @@ const GDDList = () => {
   const handleLogout = () => {
     localStorage.removeItem('access');
     navigate('/');
-    window.location.reload(); // optional
+    window.location.reload();
   };
 
   const toggleCreateModal = () => {
     setShowCreateModal(!showCreateModal);
-    if (showCreateModal) { // Reset fields when closing if it was open
+    if (showCreateModal) {
       setNewGddName('');
       setNewGddDescription('');
       setGddCreateError(null);
@@ -44,10 +43,8 @@ const GDDList = () => {
         name: newGddName,
         description: newGddDescription,
       });
-      toggleCreateModal(); // Close modal on success
-      navigate(`/gdd/${response.data.id}/notes/`); // Navigate to notes screen
-      // Optionally, refetch GDDs if needed, though navigation usually handles this
-      // api.get('/editor/gdds/').then(res => setGdds(res.data));
+      toggleCreateModal();
+      navigate(`/gdd/${response.data.id}/notes/`);
     } catch (err) {
       console.error('Failed to create GDD:', err);
       if (err.response && err.response.data) {
@@ -79,7 +76,7 @@ const GDDList = () => {
   return (
     <div style={{ padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>GDDs</h2>
+        <h2>Twoje GDD</h2>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button onClick={toggleCreateModal} style={{ padding: '6px 12px', cursor: 'pointer' }}>
             + New GDD
@@ -120,11 +117,11 @@ const GDDList = () => {
       {showCreateModal && (
         <div style={modalOverlayStyle}>
           <div style={modalContentStyle}>
-            <h2 style={{ textAlign: 'center', color: '#333', marginBottom: '25px' }}>Create New GDD</h2>
+            <h2 style={{ textAlign: 'center', color: '#333', marginBottom: '25px' }}>Stwórz nowe GDD</h2>
             <form onSubmit={handleGddCreateSubmit}>
               <div style={{ marginBottom: '15px' }}>
                 <label htmlFor="new-gdd-name" style={labelStyle}>
-                  GDD Name:
+                  Nazwa GDD:
                 </label>
                 <input
                   type="text"
@@ -137,7 +134,7 @@ const GDDList = () => {
               </div>
               <div style={{ marginBottom: '20px' }}>
                 <label htmlFor="new-gdd-description" style={labelStyle}>
-                  Description (Optional):
+                  Opis (Opcjonalny):
                 </label>
                 <textarea
                   id="new-gdd-description"
@@ -150,10 +147,10 @@ const GDDList = () => {
               {gddCreateError && <p style={errorTextStyle}>{gddCreateError}</p>}
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
                 <button type="button" onClick={toggleCreateModal} disabled={isCreatingGdd} style={buttonSecondaryStyle}>
-                  Cancel
+                  Anuluj
                 </button>
                 <button type="submit" disabled={isCreatingGdd} style={buttonPrimaryStyle}>
-                  {isCreatingGdd ? 'Creating...' : 'Create GDD'}
+                  {isCreatingGdd ? 'Creating...' : 'Stwórz GDD'}
                 </button>
               </div>
             </form>
@@ -164,7 +161,6 @@ const GDDList = () => {
   );
 };
 
-// Styles for Modal
 const modalOverlayStyle = {
   position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
   backgroundColor: 'rgba(0, 0, 0, 0.6)',

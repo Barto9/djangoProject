@@ -12,9 +12,9 @@ const GDDCreator = () => {
     if (name.trim() && description.trim()) {
       try {
         await api.post('/editor/gdds/', { name, description });
-        navigate(-1); // Go back to previous page
+        navigate(-1);
       } catch (err) {
-        alert('Failed to save GDD.');
+        alert('Nie udało się zapisać GDD.');
       }
     }
   };

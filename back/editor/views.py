@@ -24,15 +24,11 @@ class NoteDetailView(generics.RetrieveUpdateDestroyAPIView):
         return Note.objects.filter(gdd__id=gdd_id, gdd__owner=self.request.user)
 
 class NoteHierarchyView(generics.ListAPIView):
-    """
-    Returns the root notes (folders) for a GDD, with children recursively included.
-    """
     serializer_class = NoteListSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         gdd_id = self.kwargs['gdd_id']
-        # Only root notes (no parent) for this GDD and user
         return Note.objects.filter(gdd__id=gdd_id, gdd__owner=self.request.user, parent__isnull=True)
 
 class GDDListCreateView(generics.ListCreateAPIView):

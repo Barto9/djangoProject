@@ -25,12 +25,10 @@ class NoteSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'gdd', 'created_at', 'updated_at', 'children']  # <-- add 'gdd' here
 
     def get_children(self, obj):
-        # Recursively serialize children for hierarchy
         children = obj.children.all()
         return NoteSerializer(children, many=True, context=self.context).data
 
 class NoteListSerializer(serializers.ModelSerializer):
-    # For listing notes in a hierarchy (folders and notes)
     tags = TagSerializer(many=True, read_only=True)
     children = serializers.SerializerMethodField()
 

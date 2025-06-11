@@ -13,9 +13,7 @@ export default function LoginScreen({ setIsLoggedIn }) {
   const [weatherData, setWeatherData] = useState(null);
   const [weatherLocation, setWeatherLocation] = useState("Warszawa");
 
-  // Funkcja do pobierania współrzędnych miasta (prosty przykład, można rozbudować)
   async function getCoords(city) {
-    // Open-Meteo geocoding API
     const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=pl&format=json`);
     const data = await res.json();
     if (data.results && data.results.length > 0) {
@@ -28,7 +26,6 @@ export default function LoginScreen({ setIsLoggedIn }) {
     throw new Error("Nie znaleziono miasta");
   }
 
-  // Funkcja do pobierania pogody
   async function fetchWeather(city) {
     try {
       const coords = await getCoords(city);
@@ -42,7 +39,6 @@ export default function LoginScreen({ setIsLoggedIn }) {
     }
   }
 
-  // Pobierz pogodę przy pierwszym renderze i po zmianie miasta
   useEffect(() => {
     fetchWeather(weatherLocation);
   }, [weatherLocation]);
@@ -87,7 +83,7 @@ export default function LoginScreen({ setIsLoggedIn }) {
       const data = await response.json();
       setLoginSuccess("Login successful!");
       localStorage.setItem('access', data.access);
-      setIsLoggedIn(true); // <-- update parent state!
+      setIsLoggedIn(true);
     } catch (error) {
       setLoginError("Network error");
       console.error("Login error:", error);
@@ -117,7 +113,7 @@ export default function LoginScreen({ setIsLoggedIn }) {
       const data = await response.json();
       setRegisterSuccess("Registration successful! Please log in.");
       console.log("Registered user data:", data);
-      // Optionally clear the register form
+      
       setRegisterData({ email: "", username: "", password: "" });
     } catch (error) {
       setRegisterError("Network error");
@@ -144,7 +140,7 @@ export default function LoginScreen({ setIsLoggedIn }) {
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
     
-    alert("Access Token: " + accessToken); // Debugging line to check the token
+    alert("Access Token: " + accessToken);
     // Step 2: Search games using IGDB API
   const igdbResponse = await fetch('https://*****.execute-api.us-west-2.amazonaws.com/production/v4/games', {
     method: 'POST',
@@ -155,13 +151,11 @@ export default function LoginScreen({ setIsLoggedIn }) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      //query: query,
       limit: 10,
     }),
   });
 
   if (!igdbResponse.ok) {
-    // Handle HTTP errors
     alert(`Request failed: ${igdbResponse.status}`);
   }
 
@@ -243,7 +237,6 @@ export default function LoginScreen({ setIsLoggedIn }) {
   );
 }
 
-// RightMenu component for the right section
 function RightMenu({ searchQuery, handleSearchChange, searchResults, weatherData, weatherLocation, setWeatherLocation }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
