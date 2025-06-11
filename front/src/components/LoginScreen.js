@@ -9,6 +9,24 @@ export default function LoginScreen({ setIsLoggedIn }) {
   const [registerError, setRegisterError] = useState(null);
   const [loginSuccess, setLoginSuccess] = useState(null);
   const [registerSuccess, setRegisterSuccess] = useState(null);
+  const [searchResults, setSearchResults] = useState([]);
+
+
+  const handleSearchChange = async (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    if (value.trim() === "") {
+      setSearchResults([]);
+      return;
+    }
+    try {
+      const gameList = await searchGames(value);
+      setSearchResults(gameList);
+    } catch (error) {
+      setSearchResults([]);
+      alert("Wystąpił błąd podczas wyszukiwania gier: " + error.message);
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -71,6 +89,50 @@ export default function LoginScreen({ setIsLoggedIn }) {
     }
   };
 
+  async function searchGames(query) {
+    const clientId = '***'; // Podmień na swój Client ID
+    const clientSecret = '***'; // Podmień na swój Client Secret
+
+    // Step 1: Get access token from Twitch
+    const tokenResponse = await fetch(
+      "https://id.twitch.tv/oauth2/token",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        Authorization: 'Bearer ' + clientSecret,
+        body: `client_id=${clientId}&client_secret=${clientSecret}&grant_type=client_credentials`,
+      }
+    );
+    const tokenData = await tokenResponse.json();
+    const accessToken = tokenData.access_token;
+    
+    alert("Access Token: " + accessToken); // Debugging line to check the token
+    // Step 2: Search games using IGDB API
+  const igdbResponse = await fetch('https://*****.execute-api.us-west-2.amazonaws.com/production/v4/games', {
+    method: 'POST',
+    headers: {
+      'Client-ID': clientId,
+      'Authorization': `Bearer ${accessToken}`,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      //query: query,
+      limit: 10,
+    }),
+  });
+
+  if (!igdbResponse.ok) {
+    // Handle HTTP errors
+    alert(`Request failed: ${igdbResponse.status}`);
+  }
+
+  const games = await igdbResponse.json();
+  return games;
+}
+
   return (
     <div style={{ display: "flex", height: "100vh", fontFamily: "Arial, sans-serif" }}>
       {/* Left Section */}
@@ -132,27 +194,52 @@ export default function LoginScreen({ setIsLoggedIn }) {
         </form>
       </div>
 
-      {/* Right Section (Search + Menu) */}
-      <div style={{ flex: 1, borderLeft: "1px solid black", padding: "20px" }}>
+      {/* Search Input and Results - Top Right */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          width: "350px",
+          padding: "20px",
+          borderLeft: "1px solid black",
+          borderBottom: "1px solid black",
+          background: "#fff",
+          zIndex: 10,
+          minHeight: "100px"
+        }}
+      >
         <button style={{ float: "right" }} title="Menu">
           ☰
         </button>
-        <div style={{ marginTop: "60px" }}>
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ width: "100%", marginBottom: "10px" }}
-          />
-          <div>
-            <div>1. result</div>
-            <div>2. result</div>
-            <div>3. result</div>
-          </div>
-          <p style={{ fontSize: "0.8em", color: "#555", marginTop: "20px" }}>
-            Wyszukiwarka informacji o grach w IGDB pozostaje aktywna
-          </p>
+        <h3 style={{ marginTop: "60px" }}>Wyszukaj grę</h3>
+        <input
+          type="text"
+          placeholder="Search..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          style={{ width: "100%", marginBottom: "10px" }}
+        />
+        <div id="results">
+          {searchResults && searchResults.length > 0 ? (
+            <div>
+              <h4>Wyniki wyszukiwania:</h4>
+              <ul style={{ paddingLeft: "20px" }}>
+                {searchResults.map((game) => (
+                  <li key={game.id}>
+                    {game.cover?.url && (
+                      <img src={game.cover.url} alt={game.name} width="100" />
+                    )}
+                    <div>
+                      <strong>{game.name}</strong> - Ocena: {game.rating || "Brak danych"}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            searchQuery && <div>Brak wyników.</div>
+          )}
         </div>
       </div>
     </div>
