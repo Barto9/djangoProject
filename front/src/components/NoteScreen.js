@@ -113,8 +113,16 @@ function NoteScreen() {
               placeholder="Note content"
             />
             <br />
-            <button onClick={handleSave} disabled={saving} style={{ marginTop: 16 }}>
-              {saving ? "Saving..." : "Save"}
+            <button 
+              onClick={handleSave} 
+              disabled={saving} 
+              style={{ 
+                marginTop: 16, 
+                background: 'none', border: 'none', padding: '5px', cursor: 'pointer' 
+              }}
+              title={saving ? "Saving..." : "Save"}
+            >
+              <img src="/dyskietka.png" alt={saving ? "Saving..." : "Save"} style={{ width: '24px', height: '24px' }} />
             </button>
           </div>
         ) : (
@@ -138,8 +146,17 @@ function NoteScreen() {
             onChange={e => setNewNoteTitle(e.target.value)}
             style={{ width: "70%", marginRight: 8 }}
           />
-          <button onClick={handleCreateNote} disabled={creating || !newNoteTitle.trim()}>
-            {creating ? "Creating..." : "Add"}
+          <button 
+            onClick={handleCreateNote} 
+            disabled={creating || !newNoteTitle.trim()}
+            style={{ 
+              background: 'none', border: 'none', padding: '5px', cursor: 'pointer', verticalAlign: 'middle' 
+            }}
+            title={creating ? "Creating..." : "Add Note"}
+          >
+            <img 
+              src="/save.png" 
+              alt={creating ? "Creating..." : "Add Note"} style={{ width: '24px', height: '24px' }} />
           </button>
         </div>
         {tree.length > 0 ? renderTree(tree) : <div>No notes yet.</div>}

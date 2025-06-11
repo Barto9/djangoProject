@@ -209,8 +209,12 @@ export default function LoginScreen({ setIsLoggedIn }) {
           minHeight: "100px"
         }}
       >
-        <button style={{ float: "right" }} title="Menu">
-          ☰
+        <button 
+          style={{ float: "right", background: 'none', border: 'none', padding: '5px', cursor: 'pointer' }} 
+          title="Menu"
+          onClick={() => alert("Menu button clicked!")} // Placeholder action
+        >
+          <img src="/menu.png" alt="Menu" style={{ width: '24px', height: '24px' }} />
         </button>
         <h3 style={{ marginTop: "60px" }}>Wyszukaj grę</h3>
         <input

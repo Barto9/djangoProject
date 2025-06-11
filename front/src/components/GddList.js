@@ -84,8 +84,17 @@ const GDDList = () => {
           <button onClick={toggleCreateModal} style={{ padding: '6px 12px', cursor: 'pointer' }}>
             + New GDD
           </button>
-          <button onClick={handleLogout} style={{ padding: '6px 12px', cursor: 'pointer' }}>
-            Logout
+          <button 
+            onClick={handleLogout} 
+            style={{ 
+              padding: '5px', 
+              cursor: 'pointer', 
+              background: 'none', 
+              border: 'none' 
+            }}
+            title="Logout"
+          >
+            <img src="/logout.png" alt="Logout" style={{ width: '24px', height: '24px', verticalAlign: 'middle' }} />
           </button>
         </div>
       </div>
