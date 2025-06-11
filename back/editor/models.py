@@ -29,7 +29,7 @@ class Note(models.Model):
     template = models.ForeignKey(NoteTemplate, on_delete=models.SET_NULL, null=True, blank=True)
     parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.CASCADE, related_name="children")  # foldery hierarchiczne
     title = models.CharField(max_length=255)
-    content = models.TextField()  # Markdown lub RichText obsługiwany po stronie frontendu
+    content = models.TextField(blank=True)
     tags = models.ManyToManyField(Tag, through='NoteTag', related_name="notes")
     igdb_game_ref = models.JSONField(null=True, blank=True)  # dane z IGDB
     created_at = models.DateTimeField(auto_now_add=True)

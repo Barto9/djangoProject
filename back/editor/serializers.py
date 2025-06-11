@@ -22,7 +22,7 @@ class NoteSerializer(serializers.ModelSerializer):
             'id', 'gdd', 'template', 'parent', 'title', 'content', 'tags',
             'igdb_game_ref', 'created_at', 'updated_at', 'children'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'children']
+        read_only_fields = ['id', 'gdd', 'created_at', 'updated_at', 'children']  # <-- add 'gdd' here
 
     def get_children(self, obj):
         # Recursively serialize children for hierarchy
