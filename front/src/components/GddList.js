@@ -15,17 +15,27 @@ const GDDList = () => {
   const handleLogout = () => {
     localStorage.removeItem('access');
     navigate('/');
-    window.location.reload(); // Optional: force refresh to reset state
+    window.location.reload(); // optional
+  };
+
+  const handleCreateNew = () => {
+    navigate('/gdd/create');
   };
 
   return (
     <div style={{ padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>GDDs</h2>
-        <button onClick={handleLogout} style={{ padding: '6px 12px', cursor: 'pointer' }}>
-          Logout
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button onClick={handleCreateNew} style={{ padding: '6px 12px', cursor: 'pointer' }}>
+            + New GDD
+          </button>
+          <button onClick={handleLogout} style={{ padding: '6px 12px', cursor: 'pointer' }}>
+            Logout
+          </button>
+        </div>
       </div>
+
       <div style={{
         maxHeight: '300px',
         overflowY: 'auto',
