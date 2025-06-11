@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import GDDList from './GddList';
 
 export default function LoginScreen({ setIsLoggedIn }) {
@@ -10,6 +10,24 @@ export default function LoginScreen({ setIsLoggedIn }) {
   const [loginSuccess, setLoginSuccess] = useState(null);
   const [registerSuccess, setRegisterSuccess] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
+  const [weatherData, setWeatherData] = useState(null);
+
+  // Fetch weather once on mount
+  useEffect(() => {
+    async function fetchWeather() {
+      try {
+        // Example: Open-Meteo API for Warsaw, Poland
+        const res = await fetch(
+          "https://api.open-meteo.com/v1/forecast?latitude=52.23&longitude=21.01&current_weather=true"
+        );
+        const data = await res.json();
+        setWeatherData(data.current_weather);
+      } catch (e) {
+        setWeatherData({ error: "Błąd pobierania pogody" });
+      }
+    }
+    fetchWeather();
+  }, []);
 
 
   const handleSearchChange = async (e) => {
@@ -193,59 +211,94 @@ export default function LoginScreen({ setIsLoggedIn }) {
           {registerSuccess && <p style={{ color: "green" }}>{registerSuccess}</p>}
         </form>
       </div>
-
+      
       {/* Search Input and Results - Top Right */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          width: "350px",
-          padding: "20px",
-          borderLeft: "1px solid black",
-          borderBottom: "1px solid black",
-          background: "#fff",
-          zIndex: 10,
-          minHeight: "100px"
-        }}
+      <RightMenu
+        searchQuery={searchQuery}
+        handleSearchChange={handleSearchChange}
+        searchResults={searchResults}
+        weatherData={weatherData}
+      />
+    </div>
+  );
+}
+
+// RightMenu component for the right section
+function RightMenu({ searchQuery, handleSearchChange, searchResults, weatherData }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: 0,
+        right: 0,
+        width: "350px",
+        padding: "20px",
+        borderLeft: "1px solid black",
+        borderBottom: "1px solid black",
+        background: "#fff",
+        zIndex: 10,
+        minHeight: "100px"
+      }}
+    >
+      <button
+        style={{ float: "right", background: 'none', border: 'none', padding: '5px', cursor: 'pointer' }}
+        title="Menu"
+        onClick={() => setMenuOpen((open) => !open)}
       >
-        <button 
-          style={{ float: "right", background: 'none', border: 'none', padding: '5px', cursor: 'pointer' }} 
-          title="Menu"
-          onClick={() => alert("Menu button clicked!")} // Placeholder action
-        >
-          <img src="/menu.png" alt="Menu" style={{ width: '24px', height: '24px' }} />
-        </button>
-        <h3 style={{ marginTop: "60px" }}>Wyszukaj grę</h3>
-        <input
-          type="text"
-          placeholder="Search..."
-          value={searchQuery}
-          onChange={handleSearchChange}
-          style={{ width: "100%", marginBottom: "10px" }}
-        />
-        <div id="results">
-          {searchResults && searchResults.length > 0 ? (
-            <div>
-              <h4>Wyniki wyszukiwania:</h4>
-              <ul style={{ paddingLeft: "20px" }}>
-                {searchResults.map((game) => (
-                  <li key={game.id}>
-                    {game.cover?.url && (
-                      <img src={game.cover.url} alt={game.name} width="100" />
-                    )}
-                    <div>
-                      <strong>{game.name}</strong> - Ocena: {game.rating || "Brak danych"}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : (
-            searchQuery && <div>Brak wyników.</div>
-          )}
+        <img src="/menu.png" alt="Menu" style={{ width: '24px', height: '24px' }} />
+      </button>
+      {menuOpen && (
+        <div>
+          <h3 style={{ marginTop: "60px" }}>Wyszukaj grę</h3>
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            style={{ width: "100%", marginBottom: "10px" }}
+          />
+          <div id="results">
+            {searchResults && searchResults.length > 0 ? (
+              <div>
+                <h4>Wyniki wyszukiwania:</h4>
+                <ul style={{ paddingLeft: "20px" }}>
+                  {searchResults.map((game) => (
+                    <li key={game.id}>
+                      {game.cover?.url && (
+                        <img src={game.cover.url} alt={game.name} width="100" />
+                      )}
+                      <div>
+                        <strong>{game.name}</strong> - Ocena: {game.rating || "Brak danych"}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              searchQuery && <div>Brak wyników.</div>
+            )}
+          </div>
+          {/* WEATHER SECTION */}
+          <div style={{ marginTop: "30px", borderTop: "1px solid #ccc", paddingTop: "10px" }}>
+            <h4>Aktualna pogoda (Warszawa):</h4>
+            {weatherData ? (
+              weatherData.error ? (
+                <div>{weatherData.error}</div>
+              ) : (
+                <div>
+                  <div>Temperatura: {weatherData.temperature}°C</div>
+                  <div>Wiatr: {weatherData.windspeed} km/h</div>
+                  <div>Kierunek wiatru: {weatherData.winddirection}°</div>
+                </div>
+              )
+            ) : (
+              <div>Ładowanie pogody...</div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

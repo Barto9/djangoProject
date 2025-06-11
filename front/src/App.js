@@ -5,7 +5,7 @@ import GDDList from "./components/GddList";
 import GDDCreator from './components/GDDCreator';
 import NoteScreen from "./components/NoteScreen";
 
-<Route path="/gdd/create" element={<GDDCreator />} />
+//<Route path="/gdd/create" element={<GDDCreator />} />
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('access'));
@@ -36,6 +36,12 @@ function App() {
           path="/gdd/:gddId/notes/"
           element={
             isLoggedIn ? <NoteScreen /> : <Navigate to="/" />
+          }
+        />
+        <Route
+          path="/gdd/create"
+          element={
+            isLoggedIn ? <GDDCreator /> : <Navigate to="/" />
           }
         />
       </Routes>
