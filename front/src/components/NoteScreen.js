@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../api";
 import { useParams } from "react-router-dom";
+import RightMenu from "./RightMenu"; // Dodaj import
 
 function NoteScreen() {
   const { gddId } = useParams();
@@ -94,6 +95,65 @@ function NoteScreen() {
     </ul>
   );
 
+  // Dodaj stany do panelu bocznego:
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [weatherData, setWeatherData] = useState(null);
+  const [weatherLocation, setWeatherLocation] = useState("Warszawa");
+
+  // Funkcje do obsługi pogody i wyszukiwania (skopiuj z LoginScreen)
+  async function getCoords(city) {
+    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=pl&format=json`);
+    const data = await res.json();
+    if (data.results && data.results.length > 0) {
+      return {
+        latitude: data.results[0].latitude,
+        longitude: data.results[0].longitude,
+        name: data.results[0].name
+      };
+    }
+    throw new Error("Nie znaleziono miasta");
+  }
+
+  async function fetchWeather(city) {
+    try {
+      const coords = await getCoords(city);
+      const res = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true`
+      );
+      const data = await res.json();
+      setWeatherData({ ...data.current_weather, city: coords.name });
+    } catch (e) {
+      setWeatherData({ error: "Błąd pobierania pogody" });
+    }
+  }
+
+  useEffect(() => {
+    fetchWeather(weatherLocation);
+  }, [weatherLocation]);
+
+  // Przykładowa funkcja wyszukiwania (możesz podmienić na własną)
+  async function searchGames(query) {
+    // ...implementacja lub kopiuj z LoginScreen...
+    setSearchResults([]); // tymczasowo pusta
+  }
+
+  const handleSearchChange = async (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    if (value.trim() === "") {
+      setSearchResults([]);
+      return;
+    }
+    try {
+      const gameList = await searchGames(value);
+      setSearchResults(gameList);
+    } catch (error) {
+      setSearchResults([]);
+      alert("Wystąpił błąd podczas wyszukiwania gier: " + error.message);
+    }
+  };
+
   return (
     <div style={{ display: "flex", height: "100vh" }}>
       {/* Note Editor */}
@@ -161,6 +221,15 @@ function NoteScreen() {
         </div>
         {tree.length > 0 ? renderTree(tree) : <div>No notes yet.</div>}
       </div>
+      {/* Right Dropdown Panel */}
+      <RightMenu
+        searchQuery={searchQuery}
+        handleSearchChange={handleSearchChange}
+        searchResults={searchResults}
+        weatherData={weatherData}
+        weatherLocation={weatherLocation}
+        setWeatherLocation={setWeatherLocation}
+      />
     </div>
   );
 }

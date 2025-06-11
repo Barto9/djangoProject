@@ -11,23 +11,41 @@ export default function LoginScreen({ setIsLoggedIn }) {
   const [registerSuccess, setRegisterSuccess] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
   const [weatherData, setWeatherData] = useState(null);
+  const [weatherLocation, setWeatherLocation] = useState("Warszawa");
 
-  // Fetch weather once on mount
-  useEffect(() => {
-    async function fetchWeather() {
-      try {
-        // Example: Open-Meteo API for Warsaw, Poland
-        const res = await fetch(
-          "https://api.open-meteo.com/v1/forecast?latitude=52.23&longitude=21.01&current_weather=true"
-        );
-        const data = await res.json();
-        setWeatherData(data.current_weather);
-      } catch (e) {
-        setWeatherData({ error: "Błąd pobierania pogody" });
-      }
+  // Funkcja do pobierania współrzędnych miasta (prosty przykład, można rozbudować)
+  async function getCoords(city) {
+    // Open-Meteo geocoding API
+    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=pl&format=json`);
+    const data = await res.json();
+    if (data.results && data.results.length > 0) {
+      return {
+        latitude: data.results[0].latitude,
+        longitude: data.results[0].longitude,
+        name: data.results[0].name
+      };
     }
-    fetchWeather();
-  }, []);
+    throw new Error("Nie znaleziono miasta");
+  }
+
+  // Funkcja do pobierania pogody
+  async function fetchWeather(city) {
+    try {
+      const coords = await getCoords(city);
+      const res = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true`
+      );
+      const data = await res.json();
+      setWeatherData({ ...data.current_weather, city: coords.name });
+    } catch (e) {
+      setWeatherData({ error: "Błąd pobierania pogody" });
+    }
+  }
+
+  // Pobierz pogodę przy pierwszym renderze i po zmianie miasta
+  useEffect(() => {
+    fetchWeather(weatherLocation);
+  }, [weatherLocation]);
 
 
   const handleSearchChange = async (e) => {
@@ -218,13 +236,15 @@ export default function LoginScreen({ setIsLoggedIn }) {
         handleSearchChange={handleSearchChange}
         searchResults={searchResults}
         weatherData={weatherData}
+        weatherLocation={weatherLocation}
+        setWeatherLocation={setWeatherLocation}
       />
     </div>
   );
 }
 
 // RightMenu component for the right section
-function RightMenu({ searchQuery, handleSearchChange, searchResults, weatherData }) {
+function RightMenu({ searchQuery, handleSearchChange, searchResults, weatherData, weatherLocation, setWeatherLocation }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -282,12 +302,29 @@ function RightMenu({ searchQuery, handleSearchChange, searchResults, weatherData
           </div>
           {/* WEATHER SECTION */}
           <div style={{ marginTop: "30px", borderTop: "1px solid #ccc", paddingTop: "10px" }}>
-            <h4>Aktualna pogoda (Warszawa):</h4>
+            <h4>Aktualna pogoda</h4>
+            <form
+              onSubmit={e => {
+                e.preventDefault();
+                setWeatherLocation(e.target.elements.city.value);
+              }}
+              style={{ marginBottom: "10px" }}
+            >
+              <input
+                type="text"
+                name="city"
+                placeholder="Miasto"
+                defaultValue={weatherLocation}
+                style={{ width: "70%", marginRight: "5px" }}
+              />
+              <button type="submit">Pokaż</button>
+            </form>
             {weatherData ? (
               weatherData.error ? (
                 <div>{weatherData.error}</div>
               ) : (
                 <div>
+                  <div><strong>{weatherData.city}</strong></div>
                   <div>Temperatura: {weatherData.temperature}°C</div>
                   <div>Wiatr: {weatherData.windspeed} km/h</div>
                   <div>Kierunek wiatru: {weatherData.winddirection}°</div>
